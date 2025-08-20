@@ -2,5 +2,5 @@
 
 public class WordCountRes
 {
-    
+    public string Pasiseke { get; set; }
 }

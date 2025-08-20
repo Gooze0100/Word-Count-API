@@ -1,4 +1,4 @@
-﻿using WordCountAPI.Models.WordCount;
+﻿using Microsoft.AspNetCore.Antiforgery;
 using WordCountAPI.Services;
 
 namespace WordCountAPI.Endpoints;
@@ -9,20 +9,24 @@ public static class ApiEndpoints
     {
         var api = app.MapGroup("/api");
         
-        api.MapPost("/wordcount", async (IWordCountService wordCountService, HttpContext ctx) =>
+        api.MapPost("/wordcount", async (IFormFileCollection file, IWordCountService wordCountService, HttpContext ctx, IAntiforgery antiforgery) =>
         {
-            var form = await ctx.Request.ReadFormAsync();
+            // await antiforgery.ValidateRequestAsync(ctx);
+            // if (!(ctx.User.Identity is { IsAuthenticated: true }))
+            // {
+            //     return Result.Failure<WordCountRes, Exception>(new Exception("Unauthorized"));
+            // }
 
-            var req = new WordCountReq()
+            var result =  await wordCountService.LoadFile(file, ctx.RequestAborted);
+
+            if (result.IsFailure)
             {
-                FileChunk = form.Files["filechunk"],
-                FileName = form["fileName"].ToString(),
-                UploadId = new Guid(form["uploadId"].ToString()),
-                ChunkIndex = int.Parse(form["chunkIndex"].ToString()),
-                TotalChunks = int.Parse(form["totalChunks"].ToString())
-            };
+                return Results.Problem(title: result.Error.Message, statusCode:400);
+            }
 
-            return await wordCountService.UploadFileChunk(req, ctx.RequestAborted);
-        });
+            return Results.Ok(result.Value);
+        })
+        .DisableAntiforgery()
+        .WithName("UploadFile");
     }
 }
