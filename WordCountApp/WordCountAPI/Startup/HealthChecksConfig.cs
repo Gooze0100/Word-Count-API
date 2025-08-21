@@ -16,7 +16,7 @@ public static class HealthChecksConfig
             ;
     }
     
-    public static void MappAllHealthChecks(this WebApplication app)
+    public static void MapAllHealthChecks(this WebApplication app)
     {
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/health/healthy", new HealthCheckOptions

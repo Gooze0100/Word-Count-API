@@ -11,6 +11,6 @@ public static class Constants
     {
         public const string CookieName = "XSRF-TOKEN";
         public const string FormFieldName = "AntiforgeryFieldname";
-        public const string HeaderName = "X-CSRF-TOKEN";
+        public const string HeaderName = "X-XSRF-TOKEN";
     }
 }

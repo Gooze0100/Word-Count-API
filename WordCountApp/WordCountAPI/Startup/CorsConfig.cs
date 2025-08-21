@@ -1,21 +1,28 @@
-﻿namespace WordCountAPI.Startup;
+﻿using WordCountAPI.Config;
+
+namespace WordCountAPI.Startup;
 
 public static class CorsConfig
 {
-    private const string AllowAllPolicy = "AllowAll";
-    public static void AddCorsServices(this IServiceCollection services)
+    public static void AddCors(this WebApplicationBuilder builder)
     {
-        services.AddCors(options =>
+        builder.Services.AddCors(options =>
         {
-            options.AddPolicy(AllowAllPolicy, policy => 
-                policy.AllowAnyOrigin()
+            options.AddDefaultPolicy(policy =>
+            {
+                var appSettings = builder.Configuration.GetSection(Constants.Config.AppSettingsSectionKey).Get<AppSettings>();
+                policy.WithOrigins(appSettings.AccessControlAllowOrigin.ToArray())
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowAnyMethod()
-                    .AllowAnyHeader());
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
         });
     }
-
-    public static void ApplyCorsConfig(this WebApplication app)
+    
+    public static void UseCorsConfig(this WebApplication app)
     {
-        app.UseCors(AllowAllPolicy);
+        app.UseRouting();
+        app.UseCors();
     }
 }

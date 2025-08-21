@@ -11,11 +11,7 @@ public static class ApiEndpoints
         
         api.MapPost("/wordcount", async (IFormFileCollection file, IWordCountService wordCountService, HttpContext ctx, IAntiforgery antiforgery) =>
         {
-            // await antiforgery.ValidateRequestAsync(ctx);
-            // if (!(ctx.User.Identity is { IsAuthenticated: true }))
-            // {
-            //     return Result.Failure<WordCountRes, Exception>(new Exception("Unauthorized"));
-            // }
+            await antiforgery.ValidateRequestAsync(ctx);
 
             var result =  await wordCountService.LoadFile(file, ctx.RequestAborted);
 
@@ -26,7 +22,7 @@ public static class ApiEndpoints
 
             return Results.Ok(result.Value);
         })
-        .DisableAntiforgery()
+        .RequireAuthorization()
         .WithName("UploadFile");
     }
 }

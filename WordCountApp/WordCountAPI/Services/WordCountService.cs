@@ -1,14 +1,10 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.RegularExpressions;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Options;
 using WordCountAPI.Config;
-using WordCountAPI.Models.WordCount;
+using WordCountAPI.Models;
 
 namespace WordCountAPI.Services;
-
-public interface IWordCountService
-{
-    Task<Result<WordCountRes, Exception>> LoadFile(IFormFileCollection files, CancellationToken cancellationToken);
-}
 
 public class WordCountService : IWordCountService
 {
@@ -24,7 +20,7 @@ public class WordCountService : IWordCountService
         _settings = settings;
     }
     
-    public async Task<Result<WordCountRes, Exception>> LoadFile(IFormFileCollection files, CancellationToken cancellationToken)
+    public async Task<Result<List<EachWordOccurrences>, Exception>> LoadFile(IFormFileCollection files, CancellationToken cancellationToken)
     {
         try
         {
@@ -46,8 +42,10 @@ public class WordCountService : IWordCountService
             {
                 Directory.CreateDirectory(filesFolder);
             }
-            
-            foreach (var file in files)
+
+            List<EachWordOccurrences> result = new();
+                
+            foreach (var (file, index) in files.Select((f, i) => (f, i)))
             {
                 string[] allowedFileExtensions = _settings.Value.AllowedFileExtensions;
                 var fileExtension = Path.GetExtension(file.FileName);
@@ -77,25 +75,40 @@ public class WordCountService : IWordCountService
                     filesFolder,
                     newFileName
                 );
+
+                await using (FileStream fs = new(path, FileMode.Create))
+                {
+                    await file.OpenReadStream().CopyToAsync(fs, cancellationToken);
+                };
                 
-                // It overwrites the files if with same name
-                await using FileStream fs = new(path, FileMode.Create);
-                await file.OpenReadStream().CopyToAsync(fs, cancellationToken);
+                string text = File.ReadAllText(path);
+                result.Add(new EachWordOccurrences()
+                {
+                    Id = index,
+                    FileName = file.FileName,
+                    WordOccurrences = WordCount(text)
+                });
             }
 
-            // TODO: write function to return res with all counts
-            var result = new WordCountRes
-            {
-                Pasiseke = "jep"
-            };
-
             _logger.LogInformation("File successfully created");
-            return Result.Success<WordCountRes, Exception>(result);
+            return Result.Success<List<EachWordOccurrences>, Exception>(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
             return ex;
         }
+    }
+
+    private static Dictionary<string, int> WordCount(string words)
+    {
+        var allWords = Regex.Matches(words.ToLower(), @"\b\w+\b")
+            .Select(m => m.Value);
+        
+        var wordCounts = allWords.GroupBy(g => g)
+            .ToDictionary(x => x.Key, x => x.Count());
+
+        return wordCounts.OrderByDescending(o => o.Value)
+            .ToDictionary();
     }
 }
