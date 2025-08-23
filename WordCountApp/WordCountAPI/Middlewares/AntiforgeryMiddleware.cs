@@ -2,12 +2,12 @@
 
 namespace WordCountAPI.Middlewares;
 
-public class UserMiddleware :  IMiddleware
+public class AntiforgeryMiddleware :  IMiddleware
 {
     private readonly IAntiforgery _antiforgery;
-    private readonly ILogger<UserMiddleware> _logger;
+    private readonly ILogger<AntiforgeryMiddleware> _logger;
     
-    public UserMiddleware(IAntiforgery antiforgery, ILogger<UserMiddleware> logger)
+    public AntiforgeryMiddleware(IAntiforgery antiforgery, ILogger<AntiforgeryMiddleware> logger)
     {
         _antiforgery = antiforgery;
         _logger = logger;

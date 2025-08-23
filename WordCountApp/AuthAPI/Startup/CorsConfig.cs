@@ -1,7 +1,4 @@
-﻿using Shared;
-using WordCountAPI.Config;
-
-namespace WordCountAPI.Startup;
+﻿namespace AuthAPI.Startup;
 
 public static class CorsConfig
 {
@@ -11,8 +8,11 @@ public static class CorsConfig
         {
             options.AddDefaultPolicy(policy =>
             {
-                var appSettings = builder.Configuration.GetSection(Constants.Config.AppSettingsSectionKey).Get<AppSettings>();
-                policy.WithOrigins(appSettings.AccessControlAllowOrigin.ToArray())
+                var appSettings = builder.Configuration
+                    .GetSection("AccessControlAllowOrigin")
+                    .Get<string[]>();
+                
+                policy.WithOrigins(appSettings)
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowAnyMethod()
                     .AllowAnyHeader()

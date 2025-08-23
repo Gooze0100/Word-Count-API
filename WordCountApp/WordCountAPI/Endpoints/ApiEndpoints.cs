@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
+using Shared;
 using WordCountAPI.Services;
 
 namespace WordCountAPI.Endpoints;
@@ -9,10 +10,8 @@ public static class ApiEndpoints
     {
         var api = app.MapGroup("/api");
         
-        api.MapPost("/wordcount", async (IFormFileCollection file, IWordCountService wordCountService, HttpContext ctx, IAntiforgery antiforgery) =>
+        api.MapPost("/wordcount", async (IFormFileCollection file, IWordCountService wordCountService, HttpContext ctx) =>
         {
-            await antiforgery.ValidateRequestAsync(ctx);
-
             var result =  await wordCountService.LoadFile(file, ctx.RequestAborted);
 
             if (result.IsFailure)
@@ -24,5 +23,17 @@ public static class ApiEndpoints
         })
         .RequireAuthorization()
         .WithName("UploadFile");
+        
+        api.MapGet("/antiforgery/token", (HttpContext ctx, IAntiforgery antiforgery) =>
+        {
+            var tokens = antiforgery.GetAndStoreTokens(ctx);
+            ctx.Response.Cookies.Append(Constants.HeaderKeys.CookieName, tokens.RequestToken!, new CookieOptions
+            {
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
+            });
+            
+            return Results.Ok();
+        });
     }
 }

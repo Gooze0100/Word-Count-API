@@ -17,14 +17,18 @@ builder.AddOther();
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseOpenApi();
 
-app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseCorsConfig();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseAntiforgery();
+
+app.UseAuth();
+
 app.UseEndpointsConfig();
 
 app.Run();
+
+public partial class Program { }
