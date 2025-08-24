@@ -43,7 +43,7 @@ public static class Config
     {
         if (app.Environment.IsDevelopment())
         {
-            var appsettings = app.Configuration.GetSection("AppSettings").Get<AppSettings>();
+            var appSettings = app.Configuration.GetSection("AppSettings").Get<AppSettings>();
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
@@ -52,12 +52,12 @@ public static class Config
                 options.Layout = ScalarLayout.Modern;
                 options.HideClientButton = true;
 
-                if (!string.IsNullOrWhiteSpace(appsettings.Token))
+                if (!string.IsNullOrWhiteSpace(appSettings.Token))
                 {
                     options.AddPreferredSecuritySchemes("Bearer")
                         .AddHttpAuthentication("Bearer", auth =>
                         {
-                            auth.WithToken(appsettings.Token);
+                            auth.WithToken(appSettings.Token);
                         });
                 }
             });
@@ -90,7 +90,8 @@ public static class Config
         app.UseAuthentication();
         app.UseAuthorization();
 
-        if (app.Environment.IsDevelopment())
+        // Add header "X-XSRF-TOKEN" from cookies to requests for development and testing purpose
+        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
         {
             app.UseMiddleware<RequestHeaderMiddleware>();
         }

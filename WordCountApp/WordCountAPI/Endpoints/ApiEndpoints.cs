@@ -9,6 +9,18 @@ public static class ApiEndpoints
     public static void AddWordCountEndpoints(this WebApplication app)
     {
         var api = app.MapGroup("/api");
+                
+        api.MapGet("/antiforgery/token", (HttpContext ctx, IAntiforgery antiforgery) =>
+        {
+            var tokens = antiforgery.GetAndStoreTokens(ctx);
+            ctx.Response.Cookies.Append(Constants.HeaderKeys.CookieName, tokens.RequestToken!, new CookieOptions
+            {
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
+            });
+            
+            return Results.Ok();
+        });
         
         api.MapPost("/wordcount", async (IFormFileCollection file, IWordCountService wordCountService, HttpContext ctx) =>
         {
@@ -23,17 +35,5 @@ public static class ApiEndpoints
         })
         .RequireAuthorization()
         .WithName("UploadFile");
-        
-        api.MapGet("/antiforgery/token", (HttpContext ctx, IAntiforgery antiforgery) =>
-        {
-            var tokens = antiforgery.GetAndStoreTokens(ctx);
-            ctx.Response.Cookies.Append(Constants.HeaderKeys.CookieName, tokens.RequestToken!, new CookieOptions
-            {
-                HttpOnly = false,
-                SameSite = SameSiteMode.Strict
-            });
-            
-            return Results.Ok();
-        });
     }
 }

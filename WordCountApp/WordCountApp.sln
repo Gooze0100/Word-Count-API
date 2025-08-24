@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{334DFB42-3F1C-42E0-839C-A5EE14F78E57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{F563E031-DE99-4187-BE01-7D92A34CD600}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{334DFB42-3F1C-42E0-839C-A5EE14F78E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{334DFB42-3F1C-42E0-839C-A5EE14F78E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{334DFB42-3F1C-42E0-839C-A5EE14F78E57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F563E031-DE99-4187-BE01-7D92A34CD600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F563E031-DE99-4187-BE01-7D92A34CD600}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F563E031-DE99-4187-BE01-7D92A34CD600}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F563E031-DE99-4187-BE01-7D92A34CD600}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
