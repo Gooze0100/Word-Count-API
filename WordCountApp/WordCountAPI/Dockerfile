@@ -1,8 +1,8 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5103
+EXPOSE 5104
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -13,11 +13,11 @@ COPY . .
 WORKDIR "/src/WordCountAPI"
 RUN dotnet build "./WordCountAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
+FROM build AS api-publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./WordCountAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base AS final
+FROM base AS api
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=api-publish /app/publish .
 ENTRYPOINT ["dotnet", "WordCountAPI.dll"]
