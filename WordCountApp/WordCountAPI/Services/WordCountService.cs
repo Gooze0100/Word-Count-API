@@ -81,7 +81,7 @@ public class WordCountService : IWordCountService
                     await file.OpenReadStream().CopyToAsync(fs, cancellationToken);
                 };
                 
-                string text = File.ReadAllText(path);
+                string text = await File.ReadAllTextAsync(path, cancellationToken);
                 result.Add(new EachWordOccurrences()
                 {
                     Id = index,

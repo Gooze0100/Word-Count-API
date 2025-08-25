@@ -24,7 +24,7 @@ public class RateLimitingMiddleware : IMiddleware
             else if (entry.Count >= _maxRequests)
             {
                 context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                context.Response.Headers["Retry-After"] = ((int)(entry.Reset - DateTime.UtcNow).TotalSeconds).ToString();
+                context.Response.Headers.RetryAfter = ((int)(entry.Reset - DateTime.UtcNow).TotalSeconds).ToString();
                 return;
             }
             else
